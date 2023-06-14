@@ -19,8 +19,7 @@
 Необходимо сделать так, чтобы rsync подсчитывал хэш-суммы для всех файлов, даже если их время модификации и размер идентичны в источнике и приемнике.</br>
 На проверку направить скриншот с командой и результатом ее выполнения</br>
 
-Text.
-
+>rsync -avP --checksum --exclude=".*" ~/ /tmp/backup
 
 ![](./img/task1.jpg)
 
@@ -33,10 +32,29 @@ Text.
 Резервная копия размещается локально, в директории `/tmp/backup`</br>
 На проверку направить файл crontab и скриншот с результатом работы утилиты.
 
-Text
+[backup.sh](./backup.sh)
+```bash
+#!/bin/bash
 
-[file](./file)
+# Исходная директория
+SOURCE_DIR="/home/night"
+# Целевая директория
+TARGET_DIR="/tmp/backup"
+# Команда rsync. Cтандартный вывод - в /dev/null, ошибки - в лог.
+rsync -a --checksum --exclude=".*" "$SOURCE_DIR" "$TARGET_DIR" > /dev/null 2>> /var/log/backup.log
 
+# Проверка кода завершения rsync и запись лога
+if [ $? -eq 0 ]; then
+    echo "[$(date)] Резервное копирование успешно выполнено" >> /var/log/backup.log
+else
+    echo "[$(date)] Ошибка при выполнении резервного копирования" >> /var/log/backup.log
+fi
+
+```
+[/var/spool/cron/crontabs/night](./night):
+```bash
+0 0 * * * /home/night/backup.sh
+```
 ![](./img/task2.jpg)
 
 
@@ -46,7 +64,11 @@ Text
 Проверьте настройку, синхронизируя большой файл между двумя серверами</br>
 На проверку направьте команду и результат ее выполнения в виде скриншота
 
-text
+- Файл размером 10Мб:
+>dd if=/dev/random of=/home/night/large_file bs=1M count=10
+
+- Ограничение до 1 Мбит (128Кб/c)
+>rsync -avP --bwlimit=128 --checksum /home/night/large_file  night@192.168.100.10:/home/night/large_file
 
 ![](./img/task3.jpg)
 
