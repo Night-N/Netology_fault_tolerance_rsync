@@ -68,6 +68,6 @@ elif [[ "$1" == "-list" ]]; then
         exit 0
     fi
 else
-    echo "Invalid command. Usage: incr-backup.sh -list|-run"
+    echo "Неправильная команда. Доступны команды: incr-backup.sh -list|-run"
     exit 1
 fi
